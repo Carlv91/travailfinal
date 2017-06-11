@@ -1,0 +1,80 @@
+# coding utf-8
+
+import csv 
+import requests 
+from bs4 import BeautifulSoup
+
+site = "http://www.hockeydb.com/ihdb/draft/nhl"
+
+fin = "e.html"
+
+fichier = "anneerepechage.csv"
+
+entetes = {
+    "User-agent":"Carl Vaillancourt - Requête pour travail universitaire dans le cadre du cours EDM5240",
+    "From":"carl.vaillancourt.journaliste@gmail.com"
+}
+i = 0
+
+naissance = [ ]
+for annees in range(1976,2017):
+    url = site + str(annees) + fin
+    print(url)
+    contenu = requests.get(url, headers=entetes)
+    page = BeautifulSoup(contenu.text,"html.parser")
+    #print(page)
+    
+    for tr in page.find("tbody").find_all("tr"):
+        # print(tr.contents)
+        items = tr.find_all("td")
+        if len(items) != 0:
+            #print(items[0],items[3],items[5])
+            
+            if items[0].text is not "": 
+                
+                if float(items[0].text) == 1:
+                    points = 3
+                elif float(items[0].text) > 4:
+                    points = 1
+                else: 
+                    points = 2
+                #print(points)
+            
+            nom = items[3].text
+            equipe = items[5].text
+            print(points,nom,equipe)
+            
+            if equipe[-1] == "]":
+                x=equipe.find("[")
+                #print(x)
+            
+                ligue = equipe[x+1:-1]
+                #print(ligue)
+                
+                equipe = equipe[:x-1]
+                print(equipe)
+            
+            elif equipe[-1] == ")":
+                x=equipe.find("(")
+                #print(x)
+            
+                ligue = equipe[x+1:-1]
+                equipe = equipe[:x-1]
+                #print(ligue)
+                
+            else:
+                ligue = ""
+            
+            joueur = []
+            joueur.append(annees)
+            joueur.append(equipe)
+            joueur.append(points)
+            joueur.append(ligue)
+            joueur.append(nom)
+            print(joueur)
+            
+            document = open(fichier,"a")
+            pool = csv.writer(document)
+            pool.writerow(joueur)
+            
+        
