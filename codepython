@@ -17,7 +17,7 @@ entetes = {
 i = 0
 
 naissance = [ ]
-for annees in range(1979,2017):
+for annees in range(1976,2017):
     url = site + str(annees) + fin
     print(url)
     contenu = requests.get(url, headers=entetes)
